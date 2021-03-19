@@ -26,6 +26,7 @@ all_url = baseurl + "/memes/all/page/"
 pages_max = 1700  # pages_end shuld be less than this
 pages_start = 0
 pages_end = 50
+timeout = 1  # in seconds
 
 ignored_section = "Search Interest"
 memes_to_sleep = 10
@@ -53,7 +54,7 @@ def parse_list(memes_list):
 
 def get_meme_info(meme_path: str):
     meme_info = []
-    r = requests.get(baseurl + meme_path, headers=HEADERS)
+    r = requests.get(baseurl + meme_path, headers=HEADERS, timeout=timeout)
     soup = BeautifulSoup(r.text, 'html.parser')
     entries = soup.findAll('div', {'class': 'entry-section'})
     for entry in entries:
@@ -88,7 +89,7 @@ def main():
         request_url = all_url + str(i)
         print("%sUrl: %s" % (bcolors.OKBLUE, request_url))
 
-        response = requests.get(request_url, headers=HEADERS)
+        response = requests.get(request_url, headers=HEADERS, timeout=timeout)
         memes_list = get_memes_list(response)
         memes_url_list = parse_list(memes_list)
 
