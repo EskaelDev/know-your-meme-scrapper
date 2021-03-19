@@ -1,0 +1,27 @@
+sites-mooncatrescue
+
+About
+MoonCatRescue refers to an algorithmically generated non-fungible token (NFT) project which is considered to be one of the earliest algorithmically generated NFTs after CryptoPunks. While initially going relatively unnoticed in 2017, the project was rediscovered by NFT enthusiasts in mid-March 2021 due to a surge in interest of cryptoart. The discovery of the project in 2021 has been referred to as a "digital archaeological dig."
+
+
+History
+According to the Ethereum network statistics site Etherscan,[2] the MoonCatsRescue smart contract was created on August 9th, 2017.
+2021 Discovery
+On March 11th, 2021, according to screenshots provided to Know Your Meme by Twitter user @RealAllenHena, a user named "freezer" in the CryptoPunks Discord server posted a link to MoonCatRescue website (shown below).
+
+ 
+The following day, Twitter user @ETHoard tweeted a thread about the discovery, noting that MoonCatRescue predated the CryptoCats project (shown below).
+
+
+While maybe not as eye pleasing as the recent #CryptoCats discovery, after that rush happened I started digging around and came across #MoonCatRescue. Inspired by Cryptopunks as well, and actually predates CryptoCats. /1— ETHoard (@ETHoard) March 12, 2021
+ 
+
+
+
+Online Presence
+On March 13th, 2021, the cryptocurrency news site Cointelgraph[3] published an article titled "'Digital archeology': long-dormant MoonCats project rides NFT mania to the moon." That same day, the @mooncatrescue Twitter feed posted an image of a MoonCat along with a message indicating the "owner's name is 'elon'" (shown below).
+
+
+FOUND CAT- says his owner’s name is “elon”. Strange name. Can anyone help me get him home? His name is 0×00135b6b9c by the way. pic.twitter.com/FxI9jEkJ8L— MoonCat Rescue (@mooncatrescue) March 14, 2021
+ 
+
