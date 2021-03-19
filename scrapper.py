@@ -22,8 +22,11 @@ HEADERS = {'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) Apple
 
 baseurl = "https://knowyourmeme.com"
 all_url = baseurl + "/memes/all/page/"
-pages_num = 5
-# pages_num = 1700
+
+pages_max = 1700  # pages_end shuld be less than this
+pages_start = 0
+pages_end = 50
+
 ignored_section = "Search Interest"
 memes_to_sleep = 10
 
@@ -77,12 +80,13 @@ def save_to_file(file_name: str, content: str):
 def main():
     sleeper = memes_to_sleep
 
-    for i in range(pages_num):
+    for i in range(pages_start, pages_end):
 
-        print("\n%sBatch %s out of %s" % (bcolors.OKBLUE, i + 1, pages_num))
+        print("\n%sBatch %s out of %s" %
+              (bcolors.OKBLUE, i - pages_start + 1, pages_end - pages_start))
 
         request_url = all_url + str(i)
-        print("%sUrl: %s" % (bcolors.FAIL, request_url))
+        print("%sUrl: %s" % (bcolors.OKBLUE, request_url))
 
         response = requests.get(request_url, headers=HEADERS)
         memes_list = get_memes_list(response)
