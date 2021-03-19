@@ -1,7 +1,9 @@
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+import json
 import time
+from pathlib import Path
 
 
 class bcolors:
@@ -17,6 +19,17 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 
+class Meme:
+    def __init__(self, title, content, image, status, details, year, category):
+        self.title = title
+        self.content = content
+        self.image = image
+        self.status = status
+        self.details = details
+        self.year = year
+        self.category = category
+
+
 HEADERS = {'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 '
                           '(KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')}
 
@@ -26,7 +39,7 @@ all_url = baseurl + "/memes/all/page/"
 pages_max = 1700  # pages_end shuld be less than this
 pages_start = 0
 pages_end = 50
-timeout = 1  # in seconds
+timeout = 10  # in seconds
 
 ignored_section = "Search Interest"
 memes_to_sleep = 10
@@ -52,16 +65,68 @@ def parse_list(memes_list):
     return memes_path
 
 
-def get_meme_info(meme_path: str):
-    meme_info = []
+def get_meme_data(meme_path: str):
     r = requests.get(baseurl + meme_path, headers=HEADERS, timeout=timeout)
     soup = BeautifulSoup(r.text, 'html.parser')
+
+    content = extract_content(soup)
+    content = create_string(content)
+    image = extract_image(soup)
+    title = extract_title(soup)
+    status, details, year, category = extract_details(soup)
+
+    meme = Meme(trim(title),
+                content,
+                trim(image),
+                trim(status),
+                trim(details),
+                trim(year),
+                trim(category))
+    return meme
+
+
+def trim(text: str):
+    return text.replace('\n', ' ').replace('\r', '').replace(' ', '')
+
+
+def extract_content(soup: BeautifulSoup):
+    meme_info = []
     entries = soup.findAll('div', {'class': 'entry-section'})
     for entry in entries:
         text = entry.getText()
         if text != "":
             meme_info.append(text)
     return meme_info
+
+
+def extract_metadata(soup: BeautifulSoup):
+    meme_metadata = []
+    entries = soup.findAll('div', {'class': 'photo-wrapper'})
+    for entry in entries:
+        text = entry.getText()
+        if text != "":
+            meme_metadata.append(text)
+    return meme_metadata
+
+
+def extract_image(soup: BeautifulSoup):
+    entry = soup.find('div', {'class': 'photo-wrapper'})
+    return entry.next.next.next["data-src"]
+
+
+def extract_title(soup: BeautifulSoup):
+    entry = soup.find('section', class_="info wide")
+    return entry.find("h1").text
+
+
+def extract_details(soup: BeautifulSoup):
+    entry = soup.findAll('div', class_="detail")
+    status = entry[0].next.next.next.next.next.text
+    details = entry[1].next.next.next.next.next.text
+    year = entry[2].next.next.next.next.next.text
+    category = entry[3].next.next.next.next.next.text
+
+    return status, details, year, category
 
 
 def create_string(meme_info):
@@ -79,11 +144,12 @@ def save_to_file(file_name: str, content: str):
 
 
 def main():
-    sleeper = memes_to_sleep
+    Path("memes").mkdir(parents=True, exist_ok=True)
+    # sleeper = memes_to_sleep
 
-    for i in range(pages_start, pages_end):
+    for i in range(pages_start, pages_end, 1):
 
-        print("\n%sBatch %s out of %s" %
+        print("\n🔽%sBatch %s out of %s" %
               (bcolors.OKBLUE, i - pages_start + 1, pages_end - pages_start))
 
         request_url = all_url + str(i)
@@ -101,11 +167,17 @@ def main():
             # if sleeper <= 0:
             #     time.sleep(2)
             #     sleeper = memes_to_sleep
+            try:
+                meme = get_meme_data(meme_url)
+                meme_json = json.dumps(meme.__dict__)
 
-            meme_info = get_meme_info(meme_url)
-            info = create_string(meme_info)
-            meme_name = meme_url[7:].replace('-', ' ').replace('/', '-')
-            save_to_file(meme_name + '.txt', meme_name + info)
+                meme_name = meme_url[7:].replace('-', ' ').replace('/', '-')
+                save_to_file(meme_name + '.json', meme_json)
+
+            except Exception as e:
+                print("%s❌ TimedOut : MemeUrl: %s" % (bcolors.FAIL, meme_url))
+                print(e)
+                print(bcolors.OKGREEN)
 
 
 main()
