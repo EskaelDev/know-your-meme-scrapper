@@ -42,10 +42,10 @@ baseurl = "https://knowyourmeme.com"
 all_url = baseurl + "/memes/all/page/"
 
 pages_max = 1700  # pages_end shuld be less than this
-pages_start = 56
-pages_end = 500
+pages_start = 105
+pages_end = pages_max
 timeout = 10  # in seconds
-sleep_value = 1
+sleep_value = 2
 
 ignored_section = "Search Interest"
 memes_to_sleep = 10
@@ -122,15 +122,27 @@ def extract_image(soup: BeautifulSoup):
 
 def extract_title(soup: BeautifulSoup):
     entry = soup.find('section', class_="info wide")
+    if entry is None:
+        entry = soup.find('section', class_="info")
     return entry.find("h1").text
 
 
 def extract_details(soup: BeautifulSoup):
     entry = soup.findAll('div', class_="detail")
-    status = entry[0].next.next.next.next.next.text
-    details = entry[1].next.next.next.next.next.text
-    year = entry[2].next.next.next.next.next.text
-    category = entry[3].next.next.next.next.next.text
+
+    status = 'Undefined'
+    details = 'Undefined'
+    year = 1970
+    category = 'Undefined'
+
+    if len(entry) > 0:
+        status = entry[0].next.next.next.next.next.text
+    if len(entry) > 1:
+        details = entry[1].next.next.next.next.next.text
+    if len(entry) > 2:
+        year = entry[2].next.next.next.next.next.text
+    if len(entry) > 3:
+        category = entry[3].next.next.next.next.next.text
 
     return status, details, year, category
 
