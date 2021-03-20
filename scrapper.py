@@ -30,16 +30,22 @@ class Meme:
         self.category = category
 
 
-HEADERS = {'User-Agent': ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 '
-                          '(KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36')}
+HEADERS = {'User-Agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.91 Safari/537.36'),
+           'Accept-Language': 'en-US',
+           'Accept-Encoding': 'br, gzip, deflate',
+           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+           'Referer': 'http://www.google.com/',
+           'Connection': 'keep-alive',
+           'Cookie': '_y=2c150114-87C7-40B7-CBD5-92DFCB4A6117; _shopify_y=2c150114-87C7-40B7-CBD5-92DFCB4A6117; _s=4eced5ef-AC62-451A-B82E-1B6F7EC24B82; _shopify_s=4eced5ef-AC62-451A-B82E-1B6F7EC24B82'}
 
 baseurl = "https://knowyourmeme.com"
 all_url = baseurl + "/memes/all/page/"
 
 pages_max = 1700  # pages_end shuld be less than this
-pages_start = 0
-pages_end = 50
+pages_start = 31
+pages_end = 500
 timeout = 10  # in seconds
+sleep_value = 1
 
 ignored_section = "Search Interest"
 memes_to_sleep = 10
@@ -147,26 +153,26 @@ def main():
     Path("memes").mkdir(parents=True, exist_ok=True)
     # sleeper = memes_to_sleep
 
+    # in case of scraping detection wait 2 sec after few memes
+    # sleeper = sleeper - 1
+    # if sleeper <= 0:
+    # sleeper = memes_to_sleep
+
     for i in range(pages_start, pages_end, 1):
 
-        print("\n🔽%sBatch %s out of %s" %
-              (bcolors.OKBLUE, i - pages_start + 1, pages_end - pages_start))
+        print(
+            f'\n🔽{bcolors.OKBLUE}Batch {i - pages_start + 1} out of {pages_end - pages_start}')
 
         request_url = all_url + str(i)
-        print("%sUrl: %s" % (bcolors.OKBLUE, request_url))
+        print(f'{bcolors.OKBLUE}Url: {request_url}')
 
         response = requests.get(request_url, headers=HEADERS, timeout=timeout)
         memes_list = get_memes_list(response)
         memes_url_list = parse_list(memes_list)
-
+        del memes_url_list[::2]
         print(bcolors.OKGREEN)
         for meme_url in tqdm(memes_url_list):
 
-            # in case of scraping detection wait 2 sec after few memes
-            # sleeper = sleeper - 1
-            # if sleeper <= 0:
-            #     time.sleep(2)
-            #     sleeper = memes_to_sleep
             try:
                 meme = get_meme_data(meme_url)
                 meme_json = json.dumps(meme.__dict__)
@@ -175,9 +181,12 @@ def main():
                 save_to_file(meme_name + '.json', meme_json)
 
             except Exception as e:
-                print("%s❌ TimedOut : MemeUrl: %s" % (bcolors.FAIL, meme_url))
+                print(f'{bcolors.FAIL}❌ TimedOut : MemeUrl: {meme_url}')
                 print(e)
                 print(bcolors.OKGREEN)
+
+    print(f'{bcolors.OKBLUE}💤Going for a {sleep_value}sec sleep')
+    time.sleep(sleep_value)
 
 
 main()
