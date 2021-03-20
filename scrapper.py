@@ -42,10 +42,10 @@ baseurl = "https://knowyourmeme.com"
 all_url = baseurl + "/memes/all/page/"
 
 pages_max = 1700  # pages_end shuld be less than this
-pages_start = 105
-pages_end = pages_max
+pages_start = 500
+pages_end = 1583 # 117 batches
 timeout = 10  # in seconds
-sleep_value = 2
+sleep_value = 1
 
 ignored_section = "Search Interest"
 memes_to_sleep = 10
@@ -135,14 +135,19 @@ def extract_details(soup: BeautifulSoup):
     year = 1970
     category = 'Undefined'
 
-    if len(entry) > 0:
-        status = entry[0].next.next.next.next.next.text
-    if len(entry) > 1:
-        details = entry[1].next.next.next.next.next.text
-    if len(entry) > 2:
-        year = entry[2].next.next.next.next.next.text
-    if len(entry) > 3:
-        category = entry[3].next.next.next.next.next.text
+    filtered = list(filter(lambda entry: entry.next.next.text == "Status:", entry))
+    status = filtered[0].next.next.next.next.next.text if len(filtered) != 0 else status;
+
+    filtered = list(filter(lambda entry: entry.next.next.text == "Origin:", entry))
+    details = filtered[0].next.next.next.next.next.text if len(filtered) != 0 else details;
+
+    filtered = list(filter(lambda entry: entry.next.next.text == "Year:", entry))
+    if len(filtered) != 0:
+        year_to_check = filtered[0].next.next.next.next.next.text
+        year = year_to_check if year_to_check.find("unknown") == -1 else year
+    
+    filtered = list(filter(lambda entry: entry.next.next.text == "Type:", entry))
+    category = filtered[0].next.next.next.next.next.text if len(filtered) != 0 else category;
 
     return status, details, year, category
 
@@ -170,7 +175,7 @@ def main():
     # if sleeper <= 0:
     # sleeper = memes_to_sleep
 
-    for i in range(pages_start, pages_end, 1):
+    for i in range(pages_end, pages_start, -1):
 
         print(
             f'\n🔽{bcolors.OKBLUE}Batch {i - pages_start + 1} out of {pages_end - pages_start}')
