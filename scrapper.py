@@ -42,7 +42,7 @@ baseurl = "https://knowyourmeme.com"
 all_url = baseurl + "/memes/all/page/"
 
 pages_max = 1700  # pages_end shuld be less than this
-pages_start = 31
+pages_start = 56
 pages_end = 500
 timeout = 10  # in seconds
 sleep_value = 1
@@ -185,8 +185,8 @@ def main():
                 print(e)
                 print(bcolors.OKGREEN)
 
-    print(f'{bcolors.OKBLUE}💤Going for a {sleep_value}sec sleep')
-    time.sleep(sleep_value)
+        print(f'{bcolors.OKBLUE}💤Going for a {sleep_value}sec sleep')
+        time.sleep(sleep_value)
 
 
 main()
